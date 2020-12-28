@@ -52,11 +52,11 @@ export default async function(user: User, withAll = false) {
 		}
 
 		feed.addItem({
-			title: `${author.name} ${(note.renoteId ? 'renotes' : (note.replyId ? 'replies' : 'says'))}: ${note.cw ? note.cw : (note.text ? note.text : 'post a new note')}`.substring(0,100),
+			title: `${author.name} ${(note.renoteId ? 'renotes' : (note.replyId ? 'replies' : 'says'))}: ${note.cw ? note.cw : (note.text ? note.text : 'post a new note')}`.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '').substring(0,100),
 			link: `${config.url}/notes/${note.id}`,
 			date: note.createdAt,
-			description: note.cw || undefined,
-			content: `${contentStr}`
+			description: note.cw ? note.cw.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '') : undefined,
+			content: `${contentStr.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '')}`
 		});
 	}
 
