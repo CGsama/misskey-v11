@@ -190,11 +190,11 @@ export default Vue.extend({
 						challengeId: registration.challengeId,
 						stage: 0,
 						publicKeyOptions: {
-							challenge: Buffer.from(
+							challenge: Uint8Array.from(atob(
 								registration.challenge
 									.replace(/\-/g, "+")
-									.replace(/_/g, "/"),
-								'base64'
+									.replace(/_/g, "/")),
+								c => c.charCodeAt(0)
 							),
 							rp: {
 								id: hostname,

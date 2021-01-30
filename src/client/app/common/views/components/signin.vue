@@ -98,14 +98,14 @@ export default Vue.extend({
 			this.queryingKey = true;
 			return navigator.credentials.get({
 				publicKey: {
-					challenge: Buffer.from(
+					challenge: Uint8Array.from(atob(
 						this.challengeData.challenge
 							.replace(/\-/g, '+')
-							.replace(/_/g, '/'),
-							'base64'
+							.replace(/_/g, '/')),
+							c => c.charCodeAt(0)
 					),
 					allowCredentials: this.challengeData.securityKeys.map(key => ({
-						id: Buffer.from(key.id, 'hex'),
+						id: Uint8Array(key.id.match(/.{1,2}/g).map(byte => parseInt(byte, 16))),
 						type: 'public-key',
 						transports: ['usb', 'nfc', 'ble', 'internal']
 					})),
