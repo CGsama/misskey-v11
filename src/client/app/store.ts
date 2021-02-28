@@ -65,7 +65,7 @@ const defaultDeviceSettings = {
 	enableSounds: true,
 	soundVolume: 0.5,
 	mediaVolume: 0.5,
-	lang: null,
+	lang: 'zh-CN',
 	appTypeForce: 'auto',
 	debug: false,
 	lightmode: true,
