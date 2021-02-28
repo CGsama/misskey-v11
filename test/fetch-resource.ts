@@ -1,18 +1,18 @@
 /*
- * Tests of AP route negotiation
+ * Tests for Fetch resource
  *
  * How to run the tests:
- * > TS_NODE_FILES=true npx mocha test/ap-route.ts --require ts-node/register
+ * > TS_NODE_FILES=true npx mocha test/fetch-resource.ts --require ts-node/register
  *
  * To specify test:
- * > TS_NODE_FILES=true npx mocha test/ap-route.ts --require ts-node/register -g 'test name'
+ * > TS_NODE_FILES=true npx mocha test/fetch-resource.ts --require ts-node/register -g 'test name'
  */
 
 process.env.NODE_ENV = 'test';
 
-import * as childProcess from 'child_process';
 import * as assert from 'assert';
-import { async, signup, post, simpleGet, launchServer } from './utils';
+import * as childProcess from 'child_process';
+import { async, launchServer, signup, post, api, simpleGet } from './utils';
 
 // Request Accept
 const ONLY_AP = 'application/activity+json';
@@ -24,7 +24,7 @@ const UNSPECIFIED = '*/*';
 const AP = 'application/activity+json; charset=utf-8';
 const HTML = 'text/html; charset=utf-8';
 
-describe('AP route negotiation', () => {
+describe('Fetch resource', () => {
 	let p: childProcess.ChildProcess;
 
 	let alice: any;
@@ -39,6 +39,35 @@ describe('AP route negotiation', () => {
 
 	after(() => {
 		p.kill();
+	});
+
+	describe('Common', () => {
+		it('meta', async(async () => {
+			const res = await api('meta', {
+			});
+
+			assert.strictEqual(res.status, 200);
+		}));
+
+		it('GET root', async(async () => {
+			const res = await simpleGet('/', 'text/html');
+			assert.strictEqual(res.status, 200);
+		}));
+
+		it('GET docs', async(async () => {
+			const res = await simpleGet('/docs/ja-JP/about', 'text/html');
+			assert.strictEqual(res.status, 200);
+		}));
+
+		it('GET api-doc', async(async () => {
+			const res = await simpleGet('/api-doc', 'text/html');
+			assert.strictEqual(res.status, 200);
+		}));
+
+		it('GET api.json', async(async () => {
+			const res = await simpleGet('/api.json', 'application/json');
+			assert.strictEqual(res.status, 200);
+		}));
 	});
 
 	describe('/@:username', () => {
@@ -116,6 +145,26 @@ describe('AP route negotiation', () => {
 			const res = await simpleGet(`/notes/${alicesPost.id}`, UNSPECIFIED);
 			assert.strictEqual(res.status, 200);
 			assert.strictEqual(res.type, HTML);
+		}));
+	});
+
+	describe('Feeds', () => {
+		it('RSS', async(async () => {
+			const res = await simpleGet(`/@${alice.username}.rss`, UNSPECIFIED);
+			assert.strictEqual(res.status, 200);
+			assert.strictEqual(res.type, 'application/rss+xml; charset=utf-8');
+		}));
+
+		it('ATOM', async(async () => {
+			const res = await simpleGet(`/@${alice.username}.atom`, UNSPECIFIED);
+			assert.strictEqual(res.status, 200);
+			assert.strictEqual(res.type, 'application/atom+xml; charset=utf-8');
+		}));
+
+		it('JSON', async(async () => {
+			const res = await simpleGet(`/@${alice.username}.json`, UNSPECIFIED);
+			assert.strictEqual(res.status, 200);
+			assert.strictEqual(res.type, 'application/json; charset=utf-8');
 		}));
 	});
 });
