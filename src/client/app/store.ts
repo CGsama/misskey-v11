@@ -68,7 +68,7 @@ const defaultDeviceSettings = {
 	lang: 'zh-CN',
 	appTypeForce: 'auto',
 	debug: false,
-	lightmode: true,
+	lightmode: false,
 	loadRawImages: false,
 	alwaysShowNsfw: false,
 	postStyle: 'standard',
