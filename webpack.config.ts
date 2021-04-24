@@ -32,11 +32,13 @@ const version = isProduction ? meta.version : meta.version + '-' + rndstr({ leng
 const postcss = {
 	loader: 'postcss-loader',
 	options: {
-		plugins: [
-			require('cssnano')({
-				preset: 'default'
-			})
-		]
+		postcssOptions: {
+			plugins: [
+				require('cssnano')({
+					preset: 'default'
+				})
+			]
+		},
 	},
 };
 
@@ -106,7 +108,7 @@ module.exports = {
 			}, postcss]
 		}, {
 			test: /\.(eot|woff|woff2|svg|ttf)([?]?.*)$/,
-			loader: 'url-loader'
+			type: 'asset/resource'
 		}, {
 			test: /\.json5$/,
 			loader: 'json5-loader',
