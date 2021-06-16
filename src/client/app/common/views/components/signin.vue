@@ -98,7 +98,7 @@ export default Vue.extend({
 			this.queryingKey = true;
 			return navigator.credentials.get({
 				publicKey: {
-					byteify(this.challengeData.challenge, 'base64'),
+					challenge: byteify(this.challengeData.challenge, 'base64'),
 					allowCredentials: this.challengeData.securityKeys.map(key => ({
 						id: byteify(key.id, 'hex'),
 						type: 'public-key',

@@ -190,7 +190,7 @@ export default Vue.extend({
 						challengeId: registration.challengeId,
 						stage: 0,
 						publicKeyOptions: {
-							byteify(registration.challenge, 'base64'),
+							challenge: byteify(registration.challenge, 'base64'),
 							rp: {
 								id: hostname,
 								name: 'Misskey'
