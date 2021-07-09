@@ -41,7 +41,7 @@
 	<section>
 		<header>{{ $t('lang-mute') }}</header>
 		<ui-textarea v-model="mutedLangs">
-			{{ $t('muted-langs') }}<template #desc>{{ $t('muted-langs-description') }}</template>
+			Muted Language<template #desc>Similar to word rule, but for language</template>
 		</ui-textarea>
 		<ui-button @click="save">{{ $t('save') }}</ui-button>
 	</section>
