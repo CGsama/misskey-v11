@@ -7,6 +7,11 @@ export default function(me, settings, note) {
 			? settings.mutedWords.some(q => q.length > 0 && !q.some(word =>
 				word.startsWith('/') && word.endsWith('/') ? !(new RegExp(word.substr(1, word.length - 2)).test(text)) : !text.includes(word)))
 			: false;
+	const includesMutedLangs = (text: string) =>
+		text
+			? settings.mutedLangs.some(q => q.length > 0 && !q.some(word =>
+				word.startsWith('/') && word.endsWith('/') ? !(new RegExp(word.substr(1, word.length - 2)).test(text)) : !text.includes(word)))
+			: false;
 
 	return (
 		(!isMyNote && note.reply && includesMutedWords(note.reply.text)) ||
@@ -14,6 +19,7 @@ export default function(me, settings, note) {
 		(!settings.showMyRenotes && isMyNote && isPureRenote) ||
 		(!settings.showRenotedMyNotes && isPureRenote && note.renote.userId == me.id) ||
 		(!settings.showLocalRenotes && isPureRenote && note.renote.user.host == null) ||
-		(!isMyNote && includesMutedWords(note.text))
+		(!isMyNote && includesMutedWords(note.text)) ||
+		(!isMyNote && includesMutedLangs(note.lang[0]))
 	);
 }
