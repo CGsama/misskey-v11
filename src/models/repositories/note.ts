@@ -10,6 +10,7 @@ import { decodeReaction, convertLegacyReactions, convertLegacyReaction } from '.
 import { populateEmojis } from '../../misc/populate-emojis';
 import { parse } from '../../mfm/parse';
 import { toString } from '../../mfm/to-string';
+import { detect } from "langdetect";
 
 export type PackedNote = SchemaType<typeof packedNoteSchema>;
 
@@ -175,6 +176,7 @@ export class NoteRepository extends Repository<Note> {
 			mentions: note.mentions.length > 0 ? note.mentions : undefined,
 			uri: note.uri || undefined,
 			geo: note.geo || undefined,
+			lang: detect(text),
 
 			...(opts.detail ? {
 				reply: note.replyId ? this.pack(note.replyId, meId, {
@@ -337,6 +339,14 @@ export const packedNoteSchema = {
 		geo: {
 			type: 'object' as const,
 			optional: true as const, nullable: true as const,
+		},
+		lang: {
+			type: 'array' as const,
+			optional: true as const, nullable: false as const,
+			items: {
+				type: 'object' as const,
+				optional: true as const, nullable: true as const,
+			}
 		},
 	},
 };
