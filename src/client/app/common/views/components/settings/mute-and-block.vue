@@ -37,6 +37,14 @@
 		</ui-textarea>
 		<ui-button @click="save">{{ $t('save') }}</ui-button>
 	</section>
+	
+	<section>
+		<header>{{ $t('lang-mute') }}</header>
+		<ui-textarea v-model="mutedLangs">
+			{{ $t('muted-langs') }}<template #desc>{{ $t('muted-langs-description') }}</template>
+		</ui-textarea>
+		<ui-button @click="save">{{ $t('save') }}</ui-button>
+	</section>
 </ui-card>
 </template>
 
@@ -62,7 +70,8 @@ export default Vue.extend({
 			block: [],
 			muteCursor: undefined,
 			blockCursor: undefined,
-			mutedWords: ''
+			mutedWords: '',
+			mutedLangs: ''
 		};
 	},
 
@@ -71,10 +80,15 @@ export default Vue.extend({
 			get() { return this.$store.state.settings.mutedWords; },
 			set(value) { this.$store.dispatch('settings/set', { key: 'mutedWords', value }); }
 		},
+		_mutedLangs: {
+			get() { return this.$store.state.settings.mutedLangs; },
+			set(value) { this.$store.dispatch('settings/set', { key: 'mutedLangs', value }); }
+		},
 	},
 
 	mounted() {
 		this.mutedWords = this._mutedWords.map(words => words.join(' ')).join('\n');
+		this.mutedLangs = this._mutedLangs.map(words => words.join(' ')).join('\n');
 
 		this.updateMute();
 		this.updateBlock();
@@ -83,6 +97,7 @@ export default Vue.extend({
 	methods: {
 		save() {
 			this._mutedWords = this.mutedWords.split('\n').map(line => line.split(' ').filter(x => x != ''));
+			this._mutedLangs = this.mutedLangs.split('\n').map(line => line.split(' ').filter(x => x != ''));
 		},
 
 		unmute(user) {
