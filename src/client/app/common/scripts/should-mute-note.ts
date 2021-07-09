@@ -20,6 +20,6 @@ export default function(me, settings, note) {
 		(!settings.showRenotedMyNotes && isPureRenote && note.renote.userId == me.id) ||
 		(!settings.showLocalRenotes && isPureRenote && note.renote.user.host == null) ||
 		(!isMyNote && includesMutedWords(note.text)) ||
-		(!isMyNote && includesMutedLangs(note.lang[0]))
+		(!isMyNote && includesMutedLangs(note.lang[0].lang))
 	);
 }
