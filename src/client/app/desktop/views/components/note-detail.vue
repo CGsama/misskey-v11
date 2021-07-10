@@ -55,6 +55,7 @@
 				<mk-poll v-if="appearNote.poll" :note="appearNote"/>
 				<mk-url-preview v-for="url in urls" :url="url" :key="url" :detail="true"/>
 				<a class="location" v-if="appearNote.geo" :href="`https://maps.google.com/maps?q=${appearNote.geo.coordinates[1]},${appearNote.geo.coordinates[0]}`" rel="noopener" target="_blank"><fa icon="map-marker-alt"/> {{ $t('location') }}</a>
+				<a class="location" :href="`https://translate.google.com/?text=${appearNote.text}`" rel="noopener" target="_blank"> Google Translate </a>
 				<div class="map" v-if="appearNote.geo" ref="map"></div>
 				<div class="renote" v-if="appearNote.renote">
 					<mk-note-preview :note="appearNote.renote"/>
