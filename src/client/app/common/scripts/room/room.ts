@@ -180,7 +180,7 @@ export class Room {
 		//#region Init a controller
 		this.controls = new OrbitControls(this.camera, this.canvas);
 
-		this.controls.target.set(0, 1, 0);
+		this.controls.target.set(1, 1, 1);
 		this.controls.enableZoom = true;
 		this.controls.enablePan = isMyRoom;
 		this.controls.minPolarAngle = 0;
@@ -189,8 +189,8 @@ export class Room {
 		this.controls.maxAzimuthAngle = Math.PI / 2;
 		this.controls.enableDamping = true;
 		this.controls.dampingFactor = 0.2;
-		this.controls.mouseButtons.LEFT = 2;
-		this.controls.mouseButtons.MIDDLE = 1;
+		this.controls.mouseButtons.LEFT = 1;
+		this.controls.mouseButtons.MIDDLE = 2;
 		this.controls.mouseButtons.RIGHT = 0;
 		//#endregion
 
