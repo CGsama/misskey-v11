@@ -553,6 +553,10 @@ export class Room {
 	@autobind
 	private onmousedown(ev: MouseEvent) {
 		if (this.isTransformMode) return;
+		console.log(ev.target);
+		console.log(this.canvas);
+		console.log(ev.button);
+		console.log(ev.target !== this.canvas || ev.button !== 0);
 		if (ev.target !== this.canvas || ev.button !== 0) return;
 
 		const rect = (ev.target as HTMLElement).getBoundingClientRect();
