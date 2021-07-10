@@ -66,6 +66,8 @@ do {
 	currentDate = Date.now();
 } while (currentDate - date < 1000);
 
+getEventListeners().click.forEach((e)=>{e.remove()})
+
 let room: Room;
 
 export default Vue.extend({
