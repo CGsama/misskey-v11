@@ -567,6 +567,7 @@ export class Room {
 
 		const intersects = raycaster.intersectObjects(this.objects, true);
 
+		console.log(intersects);
 		for (const object of this.objects) {
 			object.traverse(child => {
 				if (child instanceof THREE.Mesh) {
