@@ -111,6 +111,7 @@ export default Vue.extend({
 		room = new Room(user, this.isMyRoom, roomInfo, this.$el, {
 			graphicsQuality: this.$store.state.device.roomGraphicsQuality,
 			onChangeSelect: obj => {
+				console.log(obj);
 				this.objectSelected = obj != null;
 				if (obj) {
 					const f = room.findFurnitureById(obj.name);
