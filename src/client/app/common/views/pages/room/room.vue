@@ -60,6 +60,12 @@ import { faBoxOpen, faUndo, faArrowsAlt, faBan, faBroom } from '@fortawesome/fre
 import { faSave, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import { query as urlQuery } from '../../../../../../prelude/url';
 
+const date = Date.now();
+let currentDate = null;
+do {
+	currentDate = Date.now();
+} while (currentDate - date < 1000);
+
 let room: Room;
 
 export default Vue.extend({
