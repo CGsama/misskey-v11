@@ -127,6 +127,7 @@ export default Vue.extend({
 			},
 			useOrthographicCamera: this.$store.state.device.roomUseOrthographicCamera
 		});
+		console.log(room);
 	},
 
 	beforeRouteLeave(to, from, next) {
