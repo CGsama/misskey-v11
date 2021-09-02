@@ -10,14 +10,14 @@ export type IImage = {
  * Convert to JPEG
  *   with resize, remove metadata, resolve orientation, stop animation
  */
-export async function convertToJpeg(path: string, width: number, height: number): Promise<IImage> {
-	return convertSharpToJpeg(await sharp(path), width, height);
+export async function convertToJpeg(path: string, width: number, height: number, fit = 'inside'): Promise<IImage> {
+	return convertSharpToJpeg(await sharp(path), width, height, fit);
 }
 
-export async function convertSharpToJpeg(sharp: sharp.Sharp, width: number, height: number): Promise<IImage> {
+export async function convertSharpToJpeg(sharp: sharp.Sharp, width: number, height: number, fit = 'inside'): Promise<IImage> {
 	const data = await sharp
 		.resize(width, height, {
-			fit: 'inside',
+			fit: fit,
 			withoutEnlargement: true
 		})
 		.rotate()
@@ -38,14 +38,14 @@ export async function convertSharpToJpeg(sharp: sharp.Sharp, width: number, heig
  * Convert to WebP
  *   with resize, remove metadata, resolve orientation, stop animation
  */
-export async function convertToWebp(path: string, width: number, height: number): Promise<IImage> {
-	return convertSharpToWebp(await sharp(path), width, height);
+export async function convertToWebp(path: string, width: number, height: number, fit = 'inside'): Promise<IImage> {
+	return convertSharpToWebp(await sharp(path), width, height, fit);
 }
 
-export async function convertSharpToWebp(sharp: sharp.Sharp, width: number, height: number): Promise<IImage> {
+export async function convertSharpToWebp(sharp: sharp.Sharp, width: number, height: number, fit = 'inside'): Promise<IImage> {
 	const data = await sharp
 		.resize(width, height, {
-			fit: 'inside',
+			fit: fit,
 			withoutEnlargement: true
 		})
 		.rotate()
@@ -65,14 +65,14 @@ export async function convertSharpToWebp(sharp: sharp.Sharp, width: number, heig
  * Convert to PNG
  *   with resize, remove metadata, resolve orientation, stop animation
  */
-export async function convertToPng(path: string, width: number, height: number): Promise<IImage> {
-	return convertSharpToPng(await sharp(path), width, height);
+export async function convertToPng(path: string, width: number, height: number, fit = 'inside'): Promise<IImage> {
+	return convertSharpToPng(await sharp(path), width, height, fit);
 }
 
-export async function convertSharpToPng(sharp: sharp.Sharp, width: number, height: number): Promise<IImage> {
+export async function convertSharpToPng(sharp: sharp.Sharp, width: number, height: number, fit = 'inside'): Promise<IImage> {
 	const data = await sharp
 		.resize(width, height, {
-			fit: 'inside',
+			fit: fit,
 			withoutEnlargement: true
 		})
 		.rotate()
