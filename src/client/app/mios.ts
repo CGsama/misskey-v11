@@ -133,6 +133,9 @@ export default class MiOS extends EventEmitter {
 			// Fetch user
 			fetch(`${apiUrl}/i`, {
 				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
 				body: JSON.stringify({
 					i: token
 				})
@@ -140,7 +143,7 @@ export default class MiOS extends EventEmitter {
 			// When success
 			.then(res => {
 				// When failed to authenticate user
-				if (res.status !== 200 && res.status < 500) {
+				if (res.status >= 400 && res.status < 500) {
 					return this.signout();
 				}
 
@@ -414,6 +417,9 @@ export default class MiOS extends EventEmitter {
 			// Send request
 			fetch(endpoint.indexOf('://') > -1 ? endpoint : `${apiUrl}/${endpoint}`, {
 				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
 				body: JSON.stringify(data),
 				credentials: endpoint === 'signin' ? 'include' : 'omit',
 				cache: 'no-cache'
