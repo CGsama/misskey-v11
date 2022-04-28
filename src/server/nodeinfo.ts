@@ -35,7 +35,7 @@ const nodeinfo2 = async () => {
 	return {
 		software: {
 			name: 'misskey',
-			version: 'CG-' + config.version,
+			version: config.version.split('-')[0],
 			repository: meta.repositoryUrl,
 		},
 		protocols: ['activitypub'],
