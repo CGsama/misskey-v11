@@ -92,6 +92,7 @@ export default define(meta, async (ps, me) => {
 		body: {
 			size: ps.limit!,
 			from: ps.offset,
+			track_scores: true,
 			query: {
 				bool: {
 					must: [{
@@ -104,7 +105,7 @@ export default define(meta, async (ps, me) => {
 				}
 			},
 			sort: [{
-				_doc: 'desc'
+				_id: 'desc'
 			}]
 		}
 	});
