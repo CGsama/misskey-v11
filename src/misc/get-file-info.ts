@@ -1,9 +1,11 @@
 import * as fs from 'fs';
+import * as util from 'util';
 import * as crypto from 'crypto';
 import * as fileType from 'file-type';
 import isSvg from 'is-svg';
 import * as probeImageSize from 'probe-image-size';
 import * as sharp from 'sharp';
+import { encode } from 'blurhash';
 
 export type FileInfo = {
 	size: number;
@@ -14,7 +16,7 @@ export type FileInfo = {
 	};
 	width?: number;
 	height?: number;
-	avgColor?: number[];
+	blurhash?: string;
 	warnings: string[];
 };
 
@@ -67,12 +69,11 @@ export async function getFileInfo(path: string): Promise<FileInfo> {
 		}
 	}
 
-	// average color
-	let avgColor: number[] | undefined;
+	let blurhash: string | undefined;
 
 	if (['image/jpeg', 'image/gif', 'image/png', 'image/apng', 'image/webp', 'image/svg+xml'].includes(type.mime)) {
-		avgColor = await calcAvgColor(path).catch(e => {
-			warnings.push(`calcAvgColor failed: ${e}`);
+		blurhash = await getBlurhash(path).catch(e => {
+			warnings.push(`getBlurhash failed: ${e}`);
 			return undefined;
 		});
 	}
@@ -83,7 +84,7 @@ export async function getFileInfo(path: string): Promise<FileInfo> {
 		type,
 		width,
 		height,
-		avgColor,
+		blurhash,
 		warnings,
 	};
 }
@@ -128,7 +129,7 @@ export async function checkSvg(path: string) {
 	try {
 		const size = await getFileSize(path);
 		if (size > 1 * 1024 * 1024) return false;
-		return isSvg(fs.readFileSync(path));
+		return isSvg(await fs.promises.readFile(path));
 	} catch {
 		return false;
 	}
@@ -138,12 +139,8 @@ export async function checkSvg(path: string) {
  * Get file size
  */
 export async function getFileSize(path: string): Promise<number> {
-	return new Promise<number>((res, rej) => {
-		fs.stat(path, (err, stats) => {
-			if (err) return rej(err);
-			res(stats.size);
-		});
-	});
+	const getStat = util.promisify(fs.stat);
+	return (await getStat(path)).size;
 }
 
 /**
@@ -184,18 +181,15 @@ async function detectImageSize(path: string): Promise<{
 /**
  * Calculate average color of image
  */
-async function calcAvgColor(path: string): Promise<number[]> {
-	const img = sharp(path);
-
-	const info = await (img as any).stats();
-
-	if (info.isOpaque) {
-		const r = Math.round(info.channels[0].mean);
-		const g = Math.round(info.channels[1].mean);
-		const b = Math.round(info.channels[2].mean);
-
-		return [r, g, b];
-	} else {
-		return [255, 255, 255];
-	}
+function getBlurhash(path: string): Promise<string> {
+	return new Promise((resolve, reject) => {
+		sharp(path)
+			.raw()
+			.ensureAlpha()
+			.resize(64, 64, { fit: 'inside' })
+			.toBuffer((err, buffer, { width, height }) => {
+				if (err) return reject(err);
+				resolve(encode(new Uint8ClampedArray(buffer), width, height, 7, 7));
+			});
+	});
 }

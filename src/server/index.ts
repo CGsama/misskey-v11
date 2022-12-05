@@ -4,8 +4,6 @@
 
 import * as fs from 'fs';
 import * as http from 'http';
-import * as http2 from 'http2';
-import * as https from 'https';
 import * as Koa from 'koa';
 import * as Router from '@koa/router';
 import * as mount from 'koa-mount';
@@ -20,7 +18,7 @@ import config from '../config';
 import apiServer from './api';
 import { sum } from '../prelude/array';
 import Logger from '../services/logger';
-import { program } from '../argv';
+import { envOption } from '../env';
 import { UserProfiles } from '../models';
 import { networkChart } from '../services/chart';
 import { genAvatar } from '../misc/gen-avatar';
@@ -39,7 +37,7 @@ if (!['production', 'test'].includes(process.env.NODE_ENV || '')) {
 	}));
 
 	// Delay
-	if (program.slow) {
+	if (envOption.slow) {
 		app.use(slow({
 			delay: 3000
 		}));
@@ -54,6 +52,11 @@ if (config.url.startsWith('https') && !config.disableHsts) {
 		await next();
 	});
 }
+
+app.use(async (ctx, next) => {
+	ctx.set('X-Content-Type-Options', 'nosniff');
+	await next();
+});
 
 app.use(mount('/api', apiServer));
 app.use(mount('/files', require('./file')));
@@ -98,16 +101,7 @@ app.use(router.routes());
 app.use(mount(require('./web')));
 
 function createServer() {
-	if (config.https) {
-		const certs: any = {};
-		for (const k of Object.keys(config.https)) {
-			certs[k] = fs.readFileSync(config.https[k]);
-		}
-		certs['allowHTTP1'] = true;
-		return http2.createSecureServer(certs, app.callback()) as https.Server;
-	} else {
-		return http.createServer(app.callback());
-	}
+	return http.createServer(app.callback());
 }
 
 // For testing

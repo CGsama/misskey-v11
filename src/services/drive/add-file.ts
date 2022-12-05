@@ -97,20 +97,20 @@ async function save(file: DriveFile, path: string, name: string, type: string, h
 		const thumbnailAccessKey = 'thumbnail-' + uuid();
 		const webpublicAccessKey = 'webpublic-' + uuid();
 
-		let url = InternalStorage.saveFromPath(accessKey, path);
+		let url = await InternalStorage.saveFromPathAsync(accessKey, path);
 		url += `/${accessKey}${getExt(name, type)}`;
 
 		let thumbnailUrl: string | null = null;
 		let webpublicUrl: string | null = null;
 
 		if (alts.thumbnail) {
-			thumbnailUrl = InternalStorage.saveFromBuffer(thumbnailAccessKey, alts.thumbnail.data);
+			thumbnailUrl = await InternalStorage.saveFromBufferAsync(thumbnailAccessKey, alts.thumbnail.data);
 			thumbnailUrl += `/${thumbnailAccessKey}.jpg`;
 			logger.info(`thumbnail stored: ${thumbnailAccessKey}`);
 		}
 
 		if (alts.webpublic) {
-			webpublicUrl = InternalStorage.saveFromBuffer(webpublicAccessKey, alts.webpublic.data);
+			webpublicUrl = await InternalStorage.saveFromBufferAsync(webpublicAccessKey, alts.webpublic.data);
 			webpublicUrl += `/${webpublicAccessKey}${getExt(name, type)}`;
 			logger.info(`web stored: ${webpublicAccessKey}`);
 		}
@@ -207,6 +207,7 @@ async function upload(key: string, stream: fs.ReadStream | Buffer, type: string,
 	} as S3.PutObjectRequest;
 
 	if (filename) params.ContentDisposition = contentDisposition('inline', filename);
+	if (meta.objectStorageSetPublicRead) params.ACL = 'public-read';
 
 	const s3 = getS3(meta);
 
@@ -301,7 +302,19 @@ export default async function(
 
 		if (much) {
 			logger.info(`file with same hash is found: ${much.id}`);
-			return much;
+
+			// ファイルに後からsensitiveが付けられたらフラグを上書き
+			if (sensitive && !much.isSensitive) {
+				await DriveFiles.update({
+					id: much.id
+				}, {
+					isSensitive: sensitive
+				});
+
+				return await DriveFiles.findOneOrFail({ id: much.id });
+			} else {
+				return much;
+			}
 		}
 	}
 
@@ -344,16 +357,11 @@ export default async function(
 	const properties: {
 		width?: number;
 		height?: number;
-		avgColor?: string;
 	} = {};
 
 	if (info.width) {
 		properties['width'] = info.width;
 		properties['height'] = info.height;
-	}
-
-	if (info.avgColor) {
-		properties['avgColor'] = `rgb(${info.avgColor.join(',')}`;
 	}
 
 	const profile = await UserProfiles.findOne(user.id);
@@ -368,6 +376,7 @@ export default async function(
 	file.folderId = folder !== null ? folder.id : null;
 	file.comment = comment;
 	file.properties = properties;
+	file.blurhash = info.blurhash || null;
 	file.isLink = isLink;
 	file.isSensitive = Users.isLocalUser(user) && profile!.alwaysMarkNsfw ? true :
 		(sensitive !== null && sensitive !== undefined)

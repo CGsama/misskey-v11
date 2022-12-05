@@ -13,7 +13,7 @@ import { extractApHashtags } from './tag';
 import { apLogger } from '../logger';
 import { Note } from '../../../models/entities/note';
 import { updateUsertags } from '../../../services/update-hashtag';
-import { Users, Instances, DriveFiles, Followings, UserProfiles, UserPublickeys } from '../../../models';
+import { Users, Instances, Followings, UserProfiles, UserPublickeys } from '../../../models';
 import { User, IRemoteUser } from '../../../models/entities/user';
 import { Emoji } from '../../../models/entities/emoji';
 import { UserNotePining } from '../../../models/entities/user-note-pinings';
@@ -29,8 +29,17 @@ import { toArray } from '../../../prelude/array';
 import { fetchNodeinfo } from '../../../services/fetch-nodeinfo';
 import { normalizeTag } from '../../../misc/normalize-tag';
 import { resolveUser } from '../../resolve-user';
+import { StatusError } from '../../../misc/fetch';
+import { resolveAnotherUser } from '../resolve-another-user';
 
 const logger = apLogger;
+
+const MAX_NAME_LENGTH = 128;
+const MAX_SUMMARY_LENGTH = 2048;
+
+const truncate = (value: string, maxLength: number) => {
+	return value.substr(0, maxLength);
+};
 
 /**
  * Validate and convert to actor object
@@ -56,8 +65,8 @@ function validateActor(x: IObject, uri: string): IActor {
 	validate('id', x.id, $.str.min(1));
 	validate('inbox', x.inbox, $.str.min(1));
 	validate('preferredUsername', x.preferredUsername, $.str.min(1).max(128).match(/^\w([\w-.]*\w)?$/));
-	validate('name', x.name, $.optional.nullable.str.max(128));
-	validate('summary', x.summary, $.optional.nullable.str.max(2048));
+	validate('name', x.name, $.optional.nullable.str);
+	validate('summary', x.summary, $.optional.nullable.str);
 
 	const idHost = toPuny(new URL(x.id!).hostname);
 	if (idHost !== expectHost) {
@@ -109,6 +118,10 @@ export async function fetchPerson(uri: string, resolver?: Resolver): Promise<Use
 export async function createPerson(uri: string, resolver?: Resolver): Promise<User> {
 	if (typeof uri !== 'string') throw new Error('uri is not string');
 
+	if (uri.startsWith(config.url)) {
+		throw new StatusError('cannot resolve local user', 400, 'cannot resolve local user');
+	}
+
 	if (resolver == null) resolver = new Resolver();
 
 	const object = await resolver.resolve(uri) as any;
@@ -125,6 +138,14 @@ export async function createPerson(uri: string, resolver?: Resolver): Promise<Us
 
 	const isBot = getApType(object) === 'Service';
 
+	const movedTo = (person.id && person.movedTo)
+		? await resolveAnotherUser(person.id, person.movedTo, resolver)
+			.catch(e => {
+				logger.warn(`Error in movedTo: ${e}`);
+				return null;
+			})
+		: null;
+
 	// Create user
 	let user: IRemoteUser;
 	try {
@@ -136,7 +157,7 @@ export async function createPerson(uri: string, resolver?: Resolver): Promise<Us
 				bannerId: null,
 				createdAt: new Date(),
 				lastFetchedAt: new Date(),
-				name: person.name,
+				name: person.name ? truncate(person.name, MAX_NAME_LENGTH) : person.name,
 				isLocked: !!person.manuallyApprovesFollowers,
 				username: person.preferredUsername,
 				usernameLower: person.preferredUsername!.toLowerCase(),
@@ -147,12 +168,13 @@ export async function createPerson(uri: string, resolver?: Resolver): Promise<Us
 				uri: person.id,
 				tags,
 				isBot,
-				isCat: (person as any).isCat === true
+				isCat: (person as any).isCat === true,
+				movedToUserId: movedTo?.id || null,
 			}).then(x => transactionalEntityManager.findOneOrFail(User, x.identifiers[0])) as IRemoteUser;
 
 			await transactionalEntityManager.insert(UserProfile, {
 				userId: user.id,
-				description: person.summary ? htmlToMfm(person.summary, person.tag) : null,
+				description: person.summary ? htmlToMfm(truncate(person.summary, MAX_SUMMARY_LENGTH), person.tag) : null,
 				url: getOneApHrefNullable(person.url),
 				fields,
 				userHost: host
@@ -215,26 +237,14 @@ export async function createPerson(uri: string, resolver?: Resolver): Promise<Us
 
 	const avatarId = avatar ? avatar.id : null;
 	const bannerId = banner ? banner.id : null;
-	const avatarUrl = avatar ? DriveFiles.getPublicUrl(avatar, true) : null;
-	const bannerUrl = banner ? DriveFiles.getPublicUrl(banner) : null;
-	const avatarColor = avatar && avatar.properties.avgColor ? avatar.properties.avgColor : null;
-	const bannerColor = banner && banner.properties.avgColor ? banner.properties.avgColor : null;
 
 	await Users.update(user!.id, {
 		avatarId,
 		bannerId,
-		avatarUrl,
-		bannerUrl,
-		avatarColor,
-		bannerColor
 	});
 
 	user!.avatarId = avatarId;
 	user!.bannerId = bannerId;
-	user!.avatarUrl = avatarUrl;
-	user!.bannerUrl = bannerUrl;
-	user!.avatarColor = avatarColor;
-	user!.bannerColor = bannerColor;
 	//#endregion
 
 	//#region カスタム絵文字取得
@@ -250,7 +260,7 @@ export async function createPerson(uri: string, resolver?: Resolver): Promise<Us
 	});
 	//#endregion
 
-	await updateFeatured(user!.id).catch(err => logger.error(err));
+	await updateFeatured(user!.id, resolver).catch(err => logger.error(err));
 
 	return user!;
 }
@@ -308,29 +318,34 @@ export async function updatePerson(uri: string, resolver?: Resolver | null, hint
 
 	const tags = extractApHashtags(person.tag).map(tag => normalizeTag(tag)).splice(0, 32);
 
+	const movedTo = (person.id && person.movedTo)
+		? await resolveAnotherUser(person.id, person.movedTo, resolver)
+			.catch(e => {
+				logger.warn(`Error in movedTo: ${e}`);
+				return null;
+			})
+		: null;
+
 	const updates = {
 		lastFetchedAt: new Date(),
 		inbox: person.inbox,
 		sharedInbox: person.sharedInbox || (person.endpoints ? person.endpoints.sharedInbox : undefined),
 		featured: person.featured,
 		emojis: emojiNames,
-		name: person.name,
+		name: person.name ? truncate(person.name, MAX_NAME_LENGTH) : person.name,
 		tags,
 		isBot: getApType(object) === 'Service',
 		isCat: (person as any).isCat === true,
 		isLocked: !!person.manuallyApprovesFollowers,
+		movedToUserId: movedTo?.id || null,
 	} as Partial<User>;
 
 	if (avatar) {
 		updates.avatarId = avatar.id;
-		updates.avatarUrl = DriveFiles.getPublicUrl(avatar, true);
-		updates.avatarColor = avatar.properties.avgColor ? avatar.properties.avgColor : null;
 	}
 
 	if (banner) {
 		updates.bannerId = banner.id;
-		updates.bannerUrl = DriveFiles.getPublicUrl(banner);
-		updates.bannerColor = banner.properties.avgColor ? banner.properties.avgColor : null;
 	}
 
 	// Update user
@@ -346,7 +361,7 @@ export async function updatePerson(uri: string, resolver?: Resolver | null, hint
 	await UserProfiles.update({ userId: exist.id }, {
 		url: person.url,
 		fields,
-		description: person.summary ? fromHtml(person.summary) : null,
+		description: person.summary ? htmlToMfm(truncate(person.summary, MAX_SUMMARY_LENGTH), person.tag) : null,
 		twitterUserId: null,
 		twitterScreenName: null,
 		githubId: null,
@@ -366,7 +381,7 @@ export async function updatePerson(uri: string, resolver?: Resolver | null, hint
 		followerSharedInbox: person.sharedInbox || (person.endpoints ? person.endpoints.sharedInbox : undefined)
 	});
 
-	await updateFeatured(exist.id).catch(err => logger.error(err));
+	await updateFeatured(exist.id, resolver).catch(err => logger.error(err));
 }
 
 /**
@@ -415,14 +430,14 @@ export function analyzeAttachments(attachments: IObject | IObject[] | undefined)
 	return { fields, services };
 }
 
-export async function updateFeatured(userId: User['id']) {
+export async function updateFeatured(userId: User['id'], resolver?: Resolver) {
 	const user = await Users.findOne(userId).then(ensure);
 	if (!Users.isRemoteUser(user)) return;
 	if (!user.featured) return;
 
 	logger.info(`Updating the featured: ${user.uri}`);
 
-	const resolver = new Resolver();
+	if (resolver == null) resolver = new Resolver();
 
 	// Resolve to (Ordered)Collection Object
 	const collection = await resolver.resolveCollection(user.featured);

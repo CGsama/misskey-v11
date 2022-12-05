@@ -8,6 +8,7 @@ import { generateVisibilityQuery } from '../../common/generate-visibility-query'
 import { Brackets } from 'typeorm';
 import { normalizeTag } from '../../../../misc/normalize-tag';
 import { safeForSql } from '../../../../misc/safe-for-sql';
+import { generateBlockedUserQuery } from '../../common/generate-block-query';
 
 export const meta = {
 	desc: {
@@ -95,10 +96,21 @@ export const meta = {
 
 export default define(meta, async (ps, me) => {
 	const query = makePaginationQuery(Notes.createQueryBuilder('note'), ps.sinceId, ps.untilId)
-		.leftJoinAndSelect('note.user', 'user');
+		.innerJoinAndSelect('note.user', 'user')
+		.leftJoinAndSelect('user.avatar', 'avatar')
+		.leftJoinAndSelect('user.banner', 'banner')
+		.leftJoinAndSelect('note.reply', 'reply')
+		.leftJoinAndSelect('note.renote', 'renote')
+		.leftJoinAndSelect('reply.user', 'replyUser')
+		.leftJoinAndSelect('replyUser.avatar', 'replyUserAvatar')
+		.leftJoinAndSelect('replyUser.banner', 'replyUserBanner')
+		.leftJoinAndSelect('renote.user', 'renoteUser')
+		.leftJoinAndSelect('renoteUser.avatar', 'renoteUserAvatar')
+		.leftJoinAndSelect('renoteUser.banner', 'renoteUserBanner');
 
 	generateVisibilityQuery(query, me);
 	if (me) generateMuteQuery(query, me);
+	if (me) generateBlockedUserQuery(query, me);
 
 	if (ps.tag) {
 		query.andWhere(`'{"${safeForSql(ps.tag) ? normalizeTag(ps.tag) : 'aichan_kawaii'}"}' <@ note.tags`);

@@ -77,6 +77,9 @@
 					<ui-input v-model="objectStorageSecretKey" :disabled="!useObjectStorage"><template #icon><fa icon="key"/></template>{{ $t('object-storage-secret-key') }}</ui-input>
 				</ui-horizon-group>
 				<ui-switch v-model="objectStorageUseSSL" :disabled="!useObjectStorage">{{ $t('object-storage-use-ssl') }}</ui-switch>
+				<ui-switch v-model="objectStorageUseProxy" :disabled="!useObjectStorage">{{ $t('objectStorageUseProxy') }}</ui-switch>
+				<ui-switch v-model="objectStorageSetPublicRead" :disabled="!useObjectStorage">{{ $t('objectStorageSetPublicRead') }}</ui-switch>
+				<ui-switch v-model="objectStorageS3ForcePathStyle" :disabled="!useObjectStorage">{{ $t('objectStorageS3ForcePathStyle') }}</ui-switch>
 			</template>
 		</section>
 		<section>
@@ -247,7 +250,7 @@
 import Vue from 'vue';
 import i18n from '../../i18n';
 import { url, host } from '../../config';
-import { toUnicode } from 'punycode';
+import { toUnicode } from 'punycode/';
 import { faHeadset, faShieldAlt, faGhost, faUserPlus, faBolt, faThumbtack, faPencilAlt, faHashtag } from '@fortawesome/free-solid-svg-icons';
 import { faEnvelope as farEnvelope, faSave } from '@fortawesome/free-regular-svg-icons';
 
@@ -317,6 +320,9 @@ export default Vue.extend({
 			objectStorageAccessKey: null,
 			objectStorageSecretKey: null,
 			objectStorageUseSSL: false,
+			objectStorageUseProxy: true,
+			objectStorageSetPublicRead: false,
+			objectStorageS3ForcePathStyle: true,
 			faHeadset, faShieldAlt, faGhost, faUserPlus, farEnvelope, faBolt, faThumbtack, faPencilAlt, faSave, faHashtag
 		};
 	},
@@ -382,6 +388,9 @@ export default Vue.extend({
 			this.objectStorageAccessKey = meta.objectStorageAccessKey;
 			this.objectStorageSecretKey = meta.objectStorageSecretKey;
 			this.objectStorageUseSSL = meta.objectStorageUseSSL;
+			this.objectStorageUseProxy = meta.objectStorageUseProxy;
+			this.objectStorageSetPublicRead = meta.objectStorageSetPublicRead;
+			this.objectStorageS3ForcePathStyle = meta.objectStorageS3ForcePathStyle;
 		});
 	},
 
@@ -506,6 +515,9 @@ export default Vue.extend({
 				objectStorageAccessKey: this.objectStorageAccessKey ? this.objectStorageAccessKey : null,
 				objectStorageSecretKey: this.objectStorageSecretKey ? this.objectStorageSecretKey : null,
 				objectStorageUseSSL: this.objectStorageUseSSL,
+				objectStorageUseProxy: this.objectStorageUseProxy,
+				objectStorageSetPublicRead: this.objectStorageSetPublicRead,
+				objectStorageS3ForcePathStyle: this.objectStorageS3ForcePathStyle,
 			}).then(() => {
 				this.$root.dialog({
 					type: 'success',

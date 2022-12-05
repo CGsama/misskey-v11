@@ -123,7 +123,6 @@ export default define(meta, async (ps, me) => {
 		repositoryUrl: instance.repositoryUrl,
 		feedbackUrl: instance.feedbackUrl,
 
-		secure: config.https != null,
 		machine: os.hostname(),
 		os: os.platform(),
 		node: process.version,
@@ -214,6 +213,9 @@ export default define(meta, async (ps, me) => {
 		response.objectStorageAccessKey = instance.objectStorageAccessKey;
 		response.objectStorageSecretKey = instance.objectStorageSecretKey;
 		response.objectStorageUseSSL = instance.objectStorageUseSSL;
+		response.objectStorageUseProxy = instance.objectStorageUseProxy;
+		response.objectStorageSetPublicRead = instance.objectStorageSetPublicRead;
+		response.objectStorageS3ForcePathStyle = instance.objectStorageS3ForcePathStyle;
 	}
 
 	return response;

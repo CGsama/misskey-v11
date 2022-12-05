@@ -27,6 +27,7 @@ import { createMessage } from '../../../services/messages/create';
 import { parseAudience } from '../audience';
 import { extractApMentions } from './mention';
 import DbResolver from '../db-resolver';
+import { StatusError } from '../../../misc/fetch';
 
 const logger = apLogger;
 
@@ -97,7 +98,7 @@ export async function createNote(value: string | IObject, resolver?: Resolver, s
 		throw new Error('actor has been suspended');
 	}
 
-	const noteAudience = await parseAudience(actor, note.to, note.cc);
+	const noteAudience = await parseAudience(actor, note.to, note.cc, resolver);
 	let visibility = noteAudience.visibility;
 	const visibleUsers = noteAudience.visibleUsers;
 
@@ -111,7 +112,7 @@ export async function createNote(value: string | IObject, resolver?: Resolver, s
 
 	let isTalk = note._misskey_talk && visibility === 'specified';
 
-	const apMentions = await extractApMentions(note.tag);
+	const apMentions = await extractApMentions(note.tag, resolver);
 	const apHashtags = await extractApHashtags(note.tag);
 
 	// 添付ファイル
@@ -178,7 +179,7 @@ export async function createNote(value: string | IObject, resolver?: Resolver, s
 				}
 			} catch (e) {
 				return {
-					status: e.statusCode >= 400 && e.statusCode < 500 ? 'permerror' : 'temperror'
+					status: (e instanceof StatusError && e.isClientError) ? 'permerror' : 'temperror'
 				};
 			}
 		};
@@ -218,15 +219,6 @@ export async function createNote(value: string | IObject, resolver?: Resolver, s
 
 		if (note.name) {
 			return await tryCreateVote(note.name, poll.choices.findIndex(x => x === note.name));
-		}
-
-		// 後方互換性のため
-		if (text) {
-			const m = text.match(/(\d+)$/);
-
-			if (m) {
-				return await tryCreateVote(m[0], Number(m[1]));
-			}
 		}
 	}
 
@@ -296,6 +288,10 @@ export async function resolveNote(value: string | IObject, resolver?: Resolver):
 			return exist;
 		}
 		//#endregion
+
+		if (uri.startsWith(config.url)) {
+			throw new StatusError('cannot resolve local note', 400, 'cannot resolve local note');
+		}
 
 		// リモートサーバーからフェッチしてきて登録
 		// ここでuriの代わりに添付されてきたNote Objectが指定されていると、サーバーフェッチを経ずにノートが生成されるが

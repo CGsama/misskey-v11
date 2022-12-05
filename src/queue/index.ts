@@ -1,8 +1,8 @@
 import * as httpSignature from 'http-signature';
 
 import config from '../config';
-import { ILocalUser } from '../models/entities/user';
-import { program } from '../argv';
+import { ILocalUser, User } from '../models/entities/user';
+import { envOption } from '../env';
 
 import processDeliver from './processors/deliver';
 import processInbox from './processors/inbox';
@@ -72,8 +72,7 @@ export function deliver(user: ILocalUser, content: any, to: string) {
 		attempts: config.deliverJobMaxAttempts || 12,
 		timeout: 1 * 60 * 1000,	// 1min
 		backoff: {
-			type: 'exponential',
-			delay: 60 * 1000
+			type: 'apBackoff'
 		},
 		removeOnComplete: true,
 		removeOnFail: true
@@ -90,8 +89,7 @@ export function inbox(activity: IActivity, signature: httpSignature.IParsedSigna
 		attempts: config.inboxJobMaxAttempts || 8,
 		timeout: 5 * 60 * 1000,	// 5min
 		backoff: {
-			type: 'exponential',
-			delay: 60 * 1000
+			type: 'apBackoff'
 		},
 		removeOnComplete: true,
 		removeOnFail: true
@@ -182,6 +180,15 @@ export function createImportUserListsJob(user: ILocalUser, fileId: DriveFile['id
 	});
 }
 
+export function createDeleteAccountJob(user: User) {
+	return dbQueue.add('deleteAccount', {
+		user: user
+	}, {
+		removeOnComplete: true,
+		removeOnFail: true
+	});
+}
+
 export function createDeleteObjectStorageFileJob(key: string) {
 	return objectStorageQueue.add('deleteFile', {
 		key: key
@@ -199,7 +206,7 @@ export function createCleanRemoteFilesJob() {
 }
 
 export default function() {
-	if (!program.onlyServer) {
+	if (!envOption.onlyServer) {
 		deliverQueue.process(config.deliverJobConcurrency || 128, processDeliver);
 		inboxQueue.process(config.inboxJobConcurrency || 16, processInbox);
 		processDb(dbQueue);

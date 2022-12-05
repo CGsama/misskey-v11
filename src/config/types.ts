@@ -6,7 +6,6 @@ export type Source = {
 	feedback_url?: string;
 	url: string;
 	port: number;
-	https?: { [x: string]: string };
 	disableHsts?: boolean;
 	db: {
 		host: string;
@@ -36,6 +35,10 @@ export type Source = {
 
 	proxy?: string;
 	proxySmtp?: string;
+
+	allowedPrivateNetworks?: string[];
+
+	maxFileSize?: number;
 
 	accesslog?: string;
 
