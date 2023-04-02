@@ -110,7 +110,7 @@ const getFeed = async (acct: string, threadDepth:string, historyCount:string, no
 	}
 	let history = parseInt(historyCount, 10);
 	//cant be 0 here or it will get all posts
-	if (isNaN(history) || history <= 0 || history > 30) {
+	if (isNaN(history) || history <= 0 || history > 300) {
 		history = 20;
 	}
 	return user && await packFeed(user, thread, history, !isNaN(noteInTitle), isNaN(noRenotes), isNaN(noReplies));
