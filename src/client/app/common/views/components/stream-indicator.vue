@@ -12,6 +12,7 @@
 		<fa icon="check"/>
 		<span>{{ $t('connected') }}</span>
 	</p>
+	<a v-if="stream.state == 'initializing'" href="." style="position:fixed; width:15vmin; height:15vmin; bottom:5vmin; right:5vmin; background-color:#ffdfdf; color:#ce93bf; border-radius:50vmin; text-align:center; vertical-align: middle; pointer-events: auto;"><img src="/files/40822c04-91b3-4b40-8c14-e70d69b3a1bc" width="100%" height="100%"></a>
 </div>
 </template>
 
