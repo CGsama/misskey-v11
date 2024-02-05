@@ -112,20 +112,40 @@ router.get('/api.json', async ctx => {
 	ctx.body = genOpenapiSpec();
 });
 
-const getFeed = async (acct: string) => {
+const getFeed = async (acct: string, threadDepth:string, historyCount:string, noteInTitle:string, noRenotes:string, noReplies:string) => {
 	const { username, host } = parseAcct(acct);
 	const user = await Users.findOne({
 		usernameLower: username.toLowerCase(),
 		host,
-		isSuspended: false
+		isSuspended: false,
 	});
-
-	return user && await packFeed(user);
+	let thread = parseInt(threadDepth, 10);
+	if (isNaN(thread) || thread < 0 || thread > 30) {
+		thread = 3;
+	}
+	let history = parseInt(historyCount, 10);
+	//cant be 0 here or it will get all posts
+	if (isNaN(history) || history <= 0 || history > 300) {
+		history = 20;
+	}
+	return user && await packFeed(user, thread, history, !isNaN(noteInTitle), isNaN(noRenotes), isNaN(noReplies));
 };
+
+// Atom With All
+router.get('/@:user.feed', async ctx => {
+	const feed = await getFeed(ctx.params.user, "30", "20", "", "false", "false");
+
+	if (feed) {
+		ctx.set('Content-Type', 'application/atom+xml; charset=utf-8');
+		ctx.body = feed.atom1();
+	} else {
+		ctx.status = 404;
+	}
+});
 
 // Atom
 router.get('/@:user.atom', async ctx => {
-	const feed = await getFeed(ctx.params.user);
+	const feed = await getFeed(ctx.params.user, ctx.query.thread, ctx.query.history, ctx.query.noteintitle, ctx.query.norenotes, ctx.query.noreplies);
 
 	if (feed) {
 		ctx.set('Content-Type', 'application/atom+xml; charset=utf-8');
@@ -137,7 +157,7 @@ router.get('/@:user.atom', async ctx => {
 
 // RSS
 router.get('/@:user.rss', async ctx => {
-	const feed = await getFeed(ctx.params.user);
+	const feed = await getFeed(ctx.params.user, ctx.query.thread, ctx.query.history, ctx.query.noteintitle, ctx.query.norenotes, ctx.query.noreplies);
 
 	if (feed) {
 		ctx.set('Content-Type', 'application/rss+xml; charset=utf-8');
@@ -149,7 +169,7 @@ router.get('/@:user.rss', async ctx => {
 
 // JSON
 router.get('/@:user.json', async ctx => {
-	const feed = await getFeed(ctx.params.user);
+	const feed = await getFeed(ctx.params.user, ctx.query.thread, ctx.query.history, ctx.query.noteintitle, ctx.query.norenotes, ctx.query.noreplies);
 
 	if (feed) {
 		ctx.set('Content-Type', 'application/json; charset=utf-8');
