@@ -11,6 +11,7 @@ import { Users, DriveFiles, Notes } from '../../../../models';
 import { DriveFile } from '../../../../models/entities/drive-file';
 import { Note } from '../../../../models/entities/note';
 import { DB_MAX_NOTE_TEXT_LENGTH } from '../../../../misc/hard-limits';
+import { setLocalInteraction } from "../../../../misc/set-local-interaction.js";
 
 let maxNoteTextLength = 500;
 
@@ -256,6 +257,7 @@ export default define(meta, async (ps, user, app) => {
 		} else if (renote.renoteId && !renote.text && !renote.fileIds) {
 			throw new ApiError(meta.errors.cannotReRenote);
 		}
+		setLocalInteraction(ps.renoteId);
 	}
 
 	let reply: Note | undefined;
@@ -271,6 +273,7 @@ export default define(meta, async (ps, user, app) => {
 		if (reply.renoteId && !reply.text && !reply.fileIds) {
 			throw new ApiError(meta.errors.cannotReplyToPureRenote);
 		}
+		setLocalInteraction(ps.replyId);
 	}
 
 	if (ps.poll) {

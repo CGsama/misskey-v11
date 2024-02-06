@@ -15,6 +15,7 @@ import { Not } from 'typeorm';
 import { IRemoteUser } from '../../../../../models/entities/user';
 import { genId } from '../../../../../misc/gen-id';
 import { ensure } from '../../../../../prelude/ensure';
+import { setLocalInteraction } from "../../../../../misc/set-local-interaction.js";
 
 export const meta = {
 	desc: {
@@ -166,4 +167,5 @@ export default define(meta, async (ps, user) => {
 
 	// リモートフォロワーにUpdate配信
 	deliverQuestionUpdate(note.id);
+	setLocalInteraction(note.id)
 });

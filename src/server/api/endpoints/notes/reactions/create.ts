@@ -4,6 +4,7 @@ import createReaction from '../../../../../services/note/reaction/create';
 import define from '../../../define';
 import { getNote } from '../../../common/getters';
 import { ApiError } from '../../../error';
+import { setLocalInteraction } from "../../../../../misc/set-local-interaction.js";
 
 export const meta = {
 	stability: 'stable',
@@ -66,5 +67,6 @@ export default define(meta, async (ps, user) => {
 		if (e.id === '51c42bb4-931a-456b-bff7-e5a8a70dd298') throw new ApiError(meta.errors.alreadyReacted);
 		throw e;
 	});
+	setLocalInteraction(note.id);
 	return;
 });

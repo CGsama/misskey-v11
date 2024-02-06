@@ -261,6 +261,8 @@ async function deleteOldFile(user: IRemoteUser) {
 		q.andWhere('file.id != :bannerId', { bannerId: user.bannerId });
 	}
 
+	q.andWhere('file."localInteraction" = false');
+
 	q.orderBy('file.id', 'ASC');
 
 	const oldFile = await q.getOne();
