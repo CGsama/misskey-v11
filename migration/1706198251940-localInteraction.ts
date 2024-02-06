@@ -1,7 +1,9 @@
-export class LocalInteraction1706198251940 {
+import {MigrationInterface, QueryRunner} from "typeorm";
+
+export class LocalInteraction1706198251940 implements MigrationInterface{
 	name = "LocalInteraction1706198251940";
 
-	async up(queryRunner) {
+	public async up(queryRunner: QueryRunner): Promise<void> {
 		await queryRunner.query(
 			`ALTER TABLE "drive_file" ADD "localInteraction" boolean NOT NULL DEFAULT FALSE`,
 		);
@@ -10,7 +12,7 @@ export class LocalInteraction1706198251940 {
 		);
 	}
 
-	async down(queryRunner) {
+	public async down(queryRunner: QueryRunner): Promise<void> {
 		await queryRunner.query(
 			`ALTER TABLE "drive_file" DROP COLUMN "localInteraction"`,
 		);
