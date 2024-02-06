@@ -187,10 +187,10 @@ async function save(file: DriveFile, path: string, name: string, type: string, h
 
 		if (['image/jpeg'].includes(type) && !webpulicSafe) { 
 			// MozJPEGルーチンを使用する (このあたりのサイズだとWebPより強い)
-			webpublic = await convertSharpToJpeg(img, 2048, 2048, { useMozjpeg: true });
+			webpublic = await convertSharpToJpeg(img, 2048, 2048, { useMozjpeg: true }, "outside");
 		} else if (['image/webp'].includes(type) && !webpulicSafe) {
-			webpublic = await convertSharpToWebp(img, 2048, 2048);
-		} else if (['image/png'].includes(type) && !webpulicSafe) {
+			webpublic = await convertSharpToWebp(img, 16383, 16383, undefined, "outside");
+		} else if (['image/png'].includes(type) && !webpulicSafe, "outside") {
 			webpublic = await convertSharpToPng(img, 2048, 2048);
 		} else {
 			logger.debug(`web image not created (not an image)`);
@@ -260,6 +260,8 @@ async function deleteOldFile(user: IRemoteUser) {
 	if (user.bannerId) {
 		q.andWhere('file.id != :bannerId', { bannerId: user.bannerId });
 	}
+
+	q.andWhere('file."localInteraction" = false');
 
 	q.orderBy('file.id', 'ASC');
 
