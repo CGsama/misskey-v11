@@ -314,6 +314,8 @@ export default define(meta, async (ps, user, app) => {
 		geo: ps.geo
 	});
 
+	setLocalInteraction(note.id);
+
 	return {
 		createdNote: await Notes.pack(note, user)
 	};
