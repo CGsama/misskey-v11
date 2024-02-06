@@ -5,6 +5,7 @@ import { ApiError } from '../../../error';
 import { getNote } from '../../../common/getters';
 import { NoteFavorites } from '../../../../../models';
 import { genId } from '../../../../../misc/gen-id';
+import { setLocalInteraction } from "../../../../../misc/set-local-interaction.js";
 
 export const meta = {
 	stability: 'stable',
@@ -69,4 +70,6 @@ export default define(meta, async (ps, user) => {
 		noteId: note.id,
 		userId: user.id
 	});
+
+	setLocalInteraction(note.id);
 });

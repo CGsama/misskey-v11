@@ -224,6 +224,11 @@ export class Note {
 		comment: '[Denormalized]'
 	})
 	public renoteUserHost: string | null;
+
+	@Column("boolean", {
+		default: false,
+	})
+	public localInteraction: boolean;
 	//#endregion
 
 	constructor(data: Partial<Note>) {
