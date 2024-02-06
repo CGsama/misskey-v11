@@ -3,10 +3,10 @@ import { Notes, DriveFiles } from "../models";
 export async function setLocalInteraction( noteid: string ) {
 	const note = await Notes.findOneBy({ id: noteid });
 	
-	await Notes.update(noteid, {localInteraction: true});
+	await Notes.update({id: noteid}, {localInteraction: true});
 
 	for (const fileid of note.fileIds) {
-		await DriveFiles.update(fileid, {localInteraction: true});
+		await DriveFiles.update({id: fileid}, {localInteraction: true});
 	}
 
 	if(note.replyId != null){
