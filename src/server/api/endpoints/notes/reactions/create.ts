@@ -4,7 +4,7 @@ import createReaction from '../../../../../services/note/reaction/create';
 import define from '../../../define';
 import { getNote } from '../../../common/getters';
 import { ApiError } from '../../../error';
-import { setLocalInteraction } from "../../../../../misc/set-local-interaction.js";
+import { setLocalInteraction } from "../../../../../misc/set-local-interaction.ts";
 
 export const meta = {
 	stability: 'stable',

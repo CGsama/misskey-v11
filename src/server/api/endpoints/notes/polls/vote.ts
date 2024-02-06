@@ -15,7 +15,7 @@ import { Not } from 'typeorm';
 import { IRemoteUser } from '../../../../../models/entities/user';
 import { genId } from '../../../../../misc/gen-id';
 import { ensure } from '../../../../../prelude/ensure';
-import { setLocalInteraction } from "../../../../../misc/set-local-interaction.js";
+import { setLocalInteraction } from "../../../../../misc/set-local-interaction.ts";
 
 export const meta = {
 	desc: {
