@@ -1,7 +1,7 @@
 <template>
 <form class="mk-signup" @submit.prevent="onSubmit" :autocomplete="Math.random()">
 	<template v-if="meta">
-		<ui-input v-if="meta.disableRegistration" v-model="invitationCode" type="text" :autocomplete="Math.random()" spellcheck="false" required styl="fill">
+		<ui-input v-if="meta.disableRegistration" v-model="invitationCode" type="text" :autocomplete="Math.random()" spellcheck="false" styl="fill">
 			<span>{{ $t('invitation-code') }}</span>
 			<template #prefix><fa icon="id-card-alt"/></template>
 			<template #desc v-html="this.$t('invitation-info').replace('{}', 'mailto:' + meta.maintainerEmail)"></template>
@@ -37,6 +37,10 @@
 				<p v-if="passwordRetypeState == 'not-match'" style="color:#FF1161"><fa icon="exclamation-triangle" fixed-width/> {{ $t('password-not-matched') }}</p>
 			</template>
 		</ui-input>
+		<ui-input v-model="signupNote" type="text" :autocomplete="Math.random()" spellcheck="false" required styl="fill">
+			<span>{{ $t('signup-note') }}</span>
+			<template #prefix><fa icon="sticky-note"/></template>
+		</ui-input>
 		<ui-switch v-model="ToSAgreement" v-if="meta.ToSUrl">
 			<i18n path="agree-to">
 				<a :href="meta.ToSUrl" target="_blank">{{ $t('tos') }}</a>
@@ -65,6 +69,7 @@ export default Vue.extend({
 			password: '',
 			retypedPassword: '',
 			invitationCode: '',
+			signupNote: '',
 			url,
 			usernameState: null,
 			passwordStrength: '',
@@ -153,6 +158,7 @@ export default Vue.extend({
 				username: this.username,
 				password: this.password,
 				invitationCode: this.invitationCode,
+				signupNote: this.signupNote,
 				'g-recaptcha-response': this.meta.enableRecaptcha ? (window as any).grecaptcha.getResponse() : null
 			}).then(() => {
 				this.$root.api('signin', {
