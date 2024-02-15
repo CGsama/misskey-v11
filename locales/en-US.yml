@@ -660,8 +660,9 @@ common/views/components/signin.vue:
   tap-key: "Click on the Security Key to log in"
   enter-2fa-code: "Enter your verification code"
 common/views/components/signup.vue:
+  signup-note: "Signup request note"
   invitation-code: "Invitation code"
-  invitation-info: "If you do not have an invitation code, please contact an <a href=\"{}\">administrator</a>."
+  invitation-info: "If you do not have an invitation code, please contact an <a href=\"{}\">administrator</a>. Optional if has note。"
   username: "Username"
   checking: "Confirming..."
   available: "Available"
