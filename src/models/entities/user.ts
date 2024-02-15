@@ -213,6 +213,11 @@ export class User {
 	})
 	public isExplorable: boolean;
 
+	@Column('varchar', {
+		length: 1024, nullable: true,
+	})
+	public signupNote: string;
+
 	constructor(data: Partial<User>) {
 		if (data == null) return;
 

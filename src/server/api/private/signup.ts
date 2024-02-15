@@ -32,9 +32,12 @@ export default async (ctx: Koa.Context) => {
 	const password = body['password'];
 	const host: string | null = process.env.NODE_ENV === 'test' ? (body['host'] || null) : null;
 	const invitationCode = body['invitationCode'];
+	const signupNote = body['signupNote'];
+
+	let disableInitially = instance && instance.disableRegistration;
 
 	if (instance && instance.disableRegistration) {
-		if (invitationCode == null || typeof invitationCode != 'string') {
+		if (invitationCode == null || typeof invitationCode != 'string')  {
 			ctx.status = 400;
 			return;
 		}
@@ -44,11 +47,16 @@ export default async (ctx: Koa.Context) => {
 		});
 
 		if (ticket == null) {
-			ctx.status = 400;
-			return;
+			if (signupNote == null || typeof signupNote != 'string' || signupNote == '') {
+				ctx.status = 400;
+				return;
+			} else {
+				disableInitially = true
+			}
+		} else {
+			RegistrationTickets.delete(ticket.id);
+			disableInitially = false
 		}
-
-		RegistrationTickets.delete(ticket.id);
 	}
 
 	// Validate username
@@ -161,4 +169,14 @@ export default async (ctx: Koa.Context) => {
 	(res as any).token = secret;
 
 	ctx.body = res;
+
+	await Users.update(account.id, {
+		signupNote: (signupNote == null || typeof signupNote != 'string' || signupNote == '') ? null : signupNote
+	});
+
+	if (disableInitially) {
+		await Users.update(account.id, {
+			isSuspended: true
+		});
+	}
 };

@@ -643,8 +643,9 @@ common/views/components/signin.vue:
   tap-key: "点击安全密钥登录"
   enter-2fa-code: "输入验证码"
 common/views/components/signup.vue:
+  signup-note: "注册申请信息"
   invitation-code: "邀请码"
-  invitation-info: "如果您没有邀请码，请联系<a href=\"{}\">管理员</a>。"
+  invitation-info: "如果您没有邀请码，请联系<a href=\"{}\">管理员</a>。有注册申请可以省略。"
   username: "用户名"
   checking: "正在确认..."
   available: "可用"
