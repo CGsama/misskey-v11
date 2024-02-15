@@ -644,7 +644,7 @@ common/views/components/signin.vue:
   enter-2fa-code: "인증 코드를 입력하여 주십시오"
 common/views/components/signup.vue:
   invitation-code: "초대 코드"
-  invitation-info: "초대 코드가 없으신 분은 <a href=\"{}\">관리자</a>에게 연락하시기 바랍니다."
+  invitation-info: "초대 코드가 없으신 분은 관리자에게 연락하시기 바랍니다."
   username: "사용자명"
   checking: "확인하는 중입니다..."
   available: "사용 가능"

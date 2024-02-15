@@ -49,6 +49,7 @@ export default async (ctx: Koa.Context) => {
 		if (ticket == null) {
 			if (signupNote == null || typeof signupNote != 'string' || signupNote == '') {
 				ctx.status = 400;
+				ctx.body = JSON.stringify({error: "Please fill up at least one of invitation code or signup note"});
 				return;
 			} else {
 				disableInitially = true
@@ -178,5 +179,7 @@ export default async (ctx: Koa.Context) => {
 		await Users.update(account.id, {
 			isSuspended: true
 		});
+		ctx.status = 400;
+		ctx.body = JSON.stringify({error: "Signup success! Please wait admin approval"});
 	}
 };

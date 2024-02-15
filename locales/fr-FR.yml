@@ -641,7 +641,7 @@ common/views/components/signin.vue:
   enter-2fa-code: "Entrez votre code de vérification"
 common/views/components/signup.vue:
   invitation-code: "Code d’invitation"
-  invitation-info: "Si vous n’avez pas de code d’invitation, contactez un <a href=\"{}\">administrateur</a>."
+  invitation-info: "Si vous n’avez pas de code d’invitation, contactez un administrateur."
   username: "Nom d'utilisateur·rice"
   checking: "Vérification…"
   available: "Disponible"

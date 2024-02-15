@@ -662,7 +662,7 @@ common/views/components/signin.vue:
 common/views/components/signup.vue:
   signup-note: "Signup request note"
   invitation-code: "Invitation code"
-  invitation-info: "If you do not have an invitation code, please contact an <a href=\"{}\">administrator</a>. Optional if has note。"
+  invitation-info: "If you do not have an invitation code, please contact an administrator. Optional if has note。"
   username: "Username"
   checking: "Confirming..."
   available: "Available"

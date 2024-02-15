@@ -4,7 +4,9 @@
 		<ui-input v-if="meta.disableRegistration" v-model="invitationCode" type="text" :autocomplete="Math.random()" spellcheck="false" styl="fill">
 			<span>{{ $t('invitation-code') }}</span>
 			<template #prefix><fa icon="id-card-alt"/></template>
-			<template #desc v-html="this.$t('invitation-info').replace('{}', 'mailto:' + meta.maintainerEmail)"></template>
+			<template #desc>
+				<p> {{ $t('invitation-info') }}</p>
+			</template>
 		</ui-input>
 		<ui-input v-model="username" type="text" pattern="^[a-zA-Z0-9_]{1,20}$" :autocomplete="Math.random()" spellcheck="false" required @input="onChangeUsername" styl="fill">
 			<span>{{ $t('username') }}</span>
@@ -37,7 +39,7 @@
 				<p v-if="passwordRetypeState == 'not-match'" style="color:#FF1161"><fa icon="exclamation-triangle" fixed-width/> {{ $t('password-not-matched') }}</p>
 			</template>
 		</ui-input>
-		<ui-input v-model="signupNote" type="text" :autocomplete="Math.random()" spellcheck="false" required styl="fill">
+		<ui-input v-model="signupNote" type="text" :autocomplete="Math.random()" spellcheck="false" styl="fill">
 			<span>{{ $t('signup-note') }}</span>
 			<template #prefix><fa icon="sticky-note"/></template>
 		</ui-input>
@@ -168,12 +170,12 @@ export default Vue.extend({
 					localStorage.setItem('i', res.i);
 					location.href = '/';
 				});
-			}).catch(() => {
+			}).catch((err) => {
 				this.submitting = false;
 
 				this.$root.dialog({
 					type: 'error',
-					text: this.$t('some-error')
+					text: err || this.$t('some-error')
 				});
 
 				if (this.meta.enableRecaptcha) {
