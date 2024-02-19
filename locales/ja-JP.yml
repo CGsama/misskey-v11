@@ -707,7 +707,7 @@ common/views/components/signin.vue:
 common/views/components/signup.vue:
   signup-note: "登録申請注記"
   invitation-code: "招待コード"
-  invitation-info: "招待コードをお持ちでない方は、<a href=\"{}\">管理者</a>までご連絡ください。注記がある場合は省略できます。"
+  invitation-info: "招待コードをお持ちでない方は、管理者までご連絡ください。注記がある場合は省略できます。"
   username: "ユーザー名"
   checking: "確認しています..."
   available: "利用できます"

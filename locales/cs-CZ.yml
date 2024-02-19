@@ -592,7 +592,7 @@ common/views/components/signin.vue:
   enter-2fa-code: "Vložte Váš verifikační kód"
 common/views/components/signup.vue:
   invitation-code: "Kód pozvánky"
-  invitation-info: "Pokud máte pozvánku, prosím kontaktujte <a href=\"{}\">administrátora</a>."
+  invitation-info: "Pokud máte pozvánku, prosím kontaktujte administrátora."
   username: "Přezdívka"
   checking: "Kontroluji..."
   available: "Dostupná"

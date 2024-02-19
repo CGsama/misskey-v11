@@ -366,7 +366,7 @@ common/views/components/signin.vue:
   login-failed: "なんかログインできんかったわ。ユーザー名とパスワードとかを確認してや。"
 common/views/components/signup.vue:
   invitation-code: "招待コード"
-  invitation-info: "招待コードをもっとらんのやったら、<a href=\"{}\">管理者</a>まで連絡してや。"
+  invitation-info: "招待コードをもっとらんのやったら、管理者まで連絡してや。"
   username: "ユーザー名"
   checking: "確認中や……"
   available: "使えるで"

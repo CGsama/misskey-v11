@@ -497,7 +497,7 @@ common/views/components/signin.vue:
   login-failed: "Autenticación fallida. Asegúrate de haber usado el nombre de usuario y contraseña correctos."
 common/views/components/signup.vue:
   invitation-code: "Código de invitación"
-  invitation-info: "Si no tienes un código de invitación, por favor contacta un <a href=\"{}\">administrador</a>."
+  invitation-info: "Si no tienes un código de invitación, por favor contacta un administrador."
   username: "Usuario"
   checking: "Comprobando..."
   available: "Disponible"

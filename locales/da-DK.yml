@@ -590,7 +590,7 @@ common/views/components/signin.vue:
   login-failed: "Fejl ved log ind. Sørg for, at du har skrevet korrekt brugernavn og adgangskode."
 common/views/components/signup.vue:
   invitation-code: "Invitationskode"
-  invitation-info: "Kontakt en <a href=\"{}\">administrator</a>, hvis du ikke har en invitationskode."
+  invitation-info: "Kontakt en administrator, hvis du ikke har en invitationskode."
   username: "Brugernavn"
   checking: "Tjekker"
   available: "Tilgængelig"
