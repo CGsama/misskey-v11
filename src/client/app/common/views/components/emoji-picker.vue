@@ -466,7 +466,7 @@ export default defineComponent({
 
 				&:hover
 					> *
-						transform scale(1.2)
+						transform scale(2)
 						transition transform 0s
 
 				> *
