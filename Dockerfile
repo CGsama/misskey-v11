@@ -10,7 +10,7 @@ COPY package.json pnpm-lock.yaml ./
 
 RUN corepack enable pnpm
 
-RUN pnpm i --frozen-lockfile
+RUN pnpm i
 
 COPY . ./
 RUN pnpm build
@@ -21,7 +21,7 @@ FROM node:18.19.1-bullseye-slim AS runner
 WORKDIR /misskey
 
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ffmpeg tini \
+ && apt-get install -y --no-install-recommends ffmpeg tini net-tools iputils-ping curl nano \
  && apt-get -y clean \
  && rm -rf /var/lib/apt/lists/* \
  && corepack enable pnpm
