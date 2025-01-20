@@ -29,13 +29,14 @@ export function genCsp() {
 	= `base-uri 'none'; `
 	+ `default-src 'none'; `
 	+ `script-src 'self' https://www.recaptcha.net/recaptcha/ https://www.gstatic.com/recaptcha/; `
+	+ `script-src-elem 'self' https://*.gothloli.club; `
 	+ `img-src 'self' https: data: blob:; `
 	+ `media-src 'self' https:; `
 	+ `style-src 'self' 'unsafe-inline'; `
 	+ `font-src 'self'; `
 	+ `frame-src 'self' https:; `
 	+ `manifest-src 'self'; `
-	+ `connect-src 'self' data: blob: ${config.wsUrl} https://api.rss2json.com; `	// wssを指定しないとSafariで動かない https://github.com/w3c/webappsec-csp/issues/7#issuecomment-1086257826
+	+ `connect-src 'self' data: blob: ${config.wsUrl} https://api.rss2json.com https://*.gothloli.club; `	// wssを指定しないとSafariで動かない https://github.com/w3c/webappsec-csp/issues/7#issuecomment-1086257826
 	+ `frame-ancestors 'none'`;
 
 	return { csp };

@@ -36,8 +36,7 @@ html
 		style
 			include ./../../../../built/client/assets/init.css
 
-		script
-			include ./../../../../assets/matomo.js
+		script(src=`/assets/matomo.js`)
 		script(src=`/assets/boot.js?${version}`)
 
 	body

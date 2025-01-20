@@ -32,4 +32,4 @@ COPY . ./
 
 ENV NODE_ENV=production
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["pnpm", "migrateandstart"]
+CMD ["bash", "-c", "sleep 10 && pnpm migrateandstart"]
