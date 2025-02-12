@@ -28,8 +28,8 @@ export function genCsp() {
 	const csp
 	= `base-uri 'none'; `
 	+ `default-src 'none'; `
-	+ `script-src 'self' https://www.recaptcha.net/recaptcha/ https://www.gstatic.com/recaptcha/; `
-	+ `script-src-elem 'self' https://*.gothloli.club; `
+	+ `script-src 'self' https://*.gothloli.club https://www.recaptcha.net/recaptcha/ https://www.gstatic.com/recaptcha/; `
+	+ `script-src-elem 'self' https://*.gothloli.club https://www.recaptcha.net/recaptcha/ https://www.gstatic.com/recaptcha/; `
 	+ `img-src 'self' https: data: blob:; `
 	+ `media-src 'self' https:; `
 	+ `style-src 'self' 'unsafe-inline'; `
